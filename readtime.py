@@ -1,21 +1,22 @@
-import os
-import multiprocessing
 import time
+import multiprocessing
 
 def read_time_data(q):
     while True:
-        with open(os.path.join(os.path.dirname(__file__), "time.txt"), "r") as f:
-            data = f.readline().strip()
+        with open("time.txt", "r") as f:
+            data = f.read().strip()
             if data:
                 num, B = data.split(',')
-                print("队列发送数据:", num)
+                print(f"Readtime.py Sending: {num}")
                 q.put(num)
-                with open(os.path.join(os.path.dirname(__file__), "time.txt"), "w") as f:
-                    f.write(f"{num},1")
+                if B == '0':
+                    print("Setting B to 1")
+                    with open("time.txt", "w") as f:
+                        f.write(f"{num},1")
         time.sleep(5)
 
 if __name__ == "__main__":
-    q = multiprocessing.Queue()
-    process = multiprocessing.Process(target=read_time_data, args=(q,))
+    queue = multiprocessing.Queue()
+    process = multiprocessing.Process(target=read_time_data, args=(queue,))
     process.start()
     process.join()
